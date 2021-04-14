@@ -12,16 +12,16 @@ import tkinter
 from tkinter import ttk
 
 root = Tk()
-root.title('Automated Turtle Report Generator')
+root.title('Automated Report Generator')
 
 title_lab = Label(root, bg='white',
-                  text='Welcome to the automated turtle report generator.\nJust select your report start date and end date, '
+                  text='Welcome to the automated report generator.\nJust select your report start date and end date, '
                              ' then click generate\nreport. The report will be generated as a word doc in the same'
                              ' folder as this\nprogram. Please input the date in this format: YYYY-mm-dd. Enjoy!!!!!')
 title_lab.pack()
 
 
-logo = ImageTk.PhotoImage(Image.open('Turtle_logo.jpg'))
+logo = ImageTk.PhotoImage(Image.open('logo.jpg'))
 panel = Label(root, image=logo).pack()
 
 root['bg'] = 'white'
@@ -43,7 +43,7 @@ def generate():
     start_date = str('\'' + start_entry.get() + '\'')
     end_date = str('\'' + end_entry.get() + '\'')
 
-    df = pd.read_excel('Turtle_database.xlsx')
+    df = pd.read_excel('database.xlsx')
     this_year = df[df['year'] == int(start_date[1:5])]
     this_year['date'] = pd.to_datetime(this_year['nest date'])
     this_year.sort_values(by='date')
@@ -57,7 +57,7 @@ def generate():
 
     surveys = per['date'].unique()
 
-    pics = os.listdir('weekly report pics')
+    pics = os.listdir('report pics')
 
     new_mask = (this_year['date'] >= str(start_date[1:5] + '-04-01')) & (this_year['date'] <= end_date)
     all_period = this_year.loc[new_mask]
@@ -69,10 +69,10 @@ def generate():
     fca_counts = period_counts[period_counts['action'] == 'FCA']
     fcu_counts = period_counts[period_counts['action'] == 'FCU']
 
-    # Pie chart, where the slices will be ordered and plotted counter-clockwise:
+    
     labels = all_nests['Location']
     sizes = all_nests['nest date']
-    #explode = (0, 0.1, 0, 0)  # only "explode" the 2nd slice (i.e. 'Hogs')
+    
 
     fig1, ax1 = plt.subplots()
     ax1.pie(sizes, labels=labels, autopct='%1.1f%%',
@@ -133,10 +133,10 @@ def generate():
 
     document = Document()
 
-    document.add_heading('Marine Turtle Conservation and Monitoring in Ras Laffan Industrial City and other sites in the State of Qatar', 0)
+    document.add_heading('DOCUMENT NAME', 0)
 
-    document.add_heading('Bi-Weekly Report: ' + str(start_date)[1:-1] + ' to ' + str(end_date)[1:-1], 1)
-    document.add_heading('Prepared by the Environmental Science Centre of Qatar University for the 2021 season', 1)
+    document.add_heading('Report: ' + str(start_date)[1:-1] + ' to ' + str(end_date)[1:-1], 1)
+    document.add_heading('THESE PEOPLE AUTHORED THIS REPORT', 1)
 
     document.add_paragraph('')
 
@@ -153,12 +153,12 @@ def generate():
 
         for i in range(0, len(new)):
 
-            if (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['Location'] == 'Ras Rakkan'):
-                    document.add_paragraph(str(len(new)) + ' nests were found on Ras Rakkan on this survey.', style='List Bullet')
+            if (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['Location'] == 'XXX SITE'):
+                    document.add_paragraph(str(len(new)) + ' nests were found on XXX SITE on this survey.', style='List Bullet')
                     break
 
-            elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['Location'] == 'Umm Tais'):
-                    document.add_paragraph(str(len(new)) + ' nests were found on Umm Tais on this survey.', style='List Bullet')
+            elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['Location'] == 'XXX SITE'):
+                    document.add_paragraph(str(len(new)) + ' nests were found on XXX SITE on this survey.', style='List Bullet')
                     break
 
             if (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['remigrant'] != ''):
@@ -181,7 +181,7 @@ def generate():
 
             i+=1
 
-        im = Image.open(os.path.join('weekly report pics\\' + pics[j]))
+        im = Image.open(os.path.join('pics\\' + pics[j]))
 
         width, height = im.size  # Get dimensions
         new_width = width * 0.70
