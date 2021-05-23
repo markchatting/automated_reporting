@@ -1,3 +1,5 @@
+from googleapiclient.discovery import build
+from google.oauth2 import service_account
 import pandas as pd
 import numpy as np
 from docx import Document
@@ -8,16 +10,16 @@ from tkinter import *
 from PIL import ImageTk, Image
 
 root = Tk()
-root.title('Automated Report Generator')
+root.title('Automated Turtle Report Generator')
 
 title_lab = Label(root, bg='white',
-                  text='Welcome to the automated report generator.\nJust select your report start date and end date, '
+                  text='Welcome to the automated turtle report generator.\nJust select your report start date and end date, '
                              ' then click generate\nreport. The report will be generated as a word doc in the same'
                              ' folder as this\nprogram. Please input the date in this format: YYYY-mm-dd. Enjoy!!!!!')
 title_lab.pack()
 
 
-logo = ImageTk.PhotoImage(Image.open('logo.jpg'))
+logo = ImageTk.PhotoImage(Image.open('Turtle_logo.jpg'))
 panel = Label(root, image=logo).pack()
 
 root['bg'] = 'white'
@@ -39,7 +41,32 @@ def generate():
     start_date = str('\'' + start_entry.get() + '\'')
     end_date = str('\'' + end_entry.get() + '\'')
 
-    df = pd.read_excel('database.xlsx')
+    SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+    SERVICE_ACCOUNT_FILE = 'keys.json'
+
+    creds = None
+    creds = service_account.Credentials.from_service_account_file(
+        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+    # The ID spreadsheet.
+    SAMPLE_SPREADSHEET_ID = '1X3rJLFptPcdWX2uIrAco9WKHy2Nv4iKY08cnq-vJQ-U'
+
+    service = build('sheets', 'v4', credentials=creds)
+
+    # Call the Sheets API
+    sheet = service.spreadsheets()
+    result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,
+                                range='Sheet1!A1:BI3000').execute()
+    values = result.get('values', [])
+#    print(values)
+
+    df = pd.DataFrame(values, columns=values[0])
+    df['year'].astype(str)
+
+
+#    df = pd.read_excel('Turtle_database.xlsx')
+    df = df.replace(np.nan, '', regex=True)
+    df['all.tags'] = df['remigrant'] + df['reclutch'] + df['new.tag']
 
     for u in range(0, len(df)):
         if 'est' in df['action'][u]:
@@ -49,14 +76,35 @@ def generate():
 
     for v in range(0, len(df)):
         if 'Fuw' in df['Location'][v]:
-            df['Location'][v] = 'beach'
+            df['Location'][v] = 'Fuwairit'
         else:
             df['Location'][v] = df['Location'][v]
 
-    this_year = df[df['year'] == int(start_date[1:5])]
+    for p in range(0, len(df)):
+        if 'Laf' in df['Location'][p]:
+            df['Location'][p] = 'Ras Laffan'
+        else:
+            df['Location'][p] = df['Location'][p]
+
+    for k in range(0, len(df)):
+        if 'Gha' in df['Location'][k]:
+            df['Location'][k] = 'Al Ghariyah'
+        else:
+            df['Location'][k] = df['Location'][k]
+
+
+
+    this_year = df[df['year'] == start_date[1:5]]
     this_year['date'] = pd.to_datetime(this_year['nest date'])
     this_year.sort_values(by='date')
 
+    nth = {
+        '1': "first",
+        '2': "second",
+        '3': "third",
+        '4': "fourth",
+        '5': "fifth"
+    }
 
     mask = (this_year['date'] >= start_date) & (this_year['date'] <= end_date)
     period = this_year.loc[mask]
@@ -140,10 +188,10 @@ def generate():
 
     document = Document()
 
-    document.add_heading('PROJECT TITLE', 0)
+    document.add_heading('Marine Turtle Conservation and Monitoring in Ras Laffan Industrial City and other sites in the State of Qatar', 0)
 
-    document.add_heading('Report: ' + str(start_date)[1:-1] + ' to ' + str(end_date)[1:-1], 1)
-    document.add_heading('Report authors', 1)
+    document.add_heading('Bi-Weekly Report: ' + str(start_date)[1:-1] + ' to ' + str(end_date)[1:-1], 1)
+    document.add_heading('Prepared by the Environmental Science Centre of Qatar University for the 2021 season', 1)
 
     document.add_paragraph('')
 
@@ -162,31 +210,34 @@ def generate():
 
         for i in range(0, len(new)):
 
-            if (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['Location'] == 'Beach 1'):
-                    document.add_paragraph(str(len(new)) + ' nests were found on Beach 1 on this survey.', style='List Bullet')
+            if (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['Location'] == 'Ras Rakkan'):
+                    document.add_paragraph(str(len(new)) + ' nests were found on Ras Rakkan on this survey.', style='List Bullet')
                     break
 
-            elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['Location'] == ' Beach 2'):
-                    document.add_paragraph(str(len(new)) + ' nests were found on Beach 2 on this survey.', style='List Bullet')
+            elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['Location'] == 'Umm Tais'):
+                    document.add_paragraph(str(len(new)) + ' nests were found on Umm Tais on this survey.', style='List Bullet')
                     break
 
             if (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['remigrant'] != ''):
-                    document.add_paragraph('A live turtle nesting was observed on ' + new.iloc[i]['Location'] + '. This turtle was a remigrant that was previously fitted with tag nos. ' + new.iloc[i]['remigrant'] + '. She was previously captured nesting ' + str(new.iloc[i]['remigrant.period']) + ' years ago. The clutch she deposited contained ' + str(new.iloc[i]['eggs'])[0:-2] + ' eggs.', style='List Bullet')
+                    document.add_paragraph('A live turtle nesting was observed on ' + new.iloc[i]['Location'] + '. This turtle was a remigrant that was previously fitted with tag nos. ' + new.iloc[i]['remigrant'] + ' in ' + str(df[df['all.tags'].str.contains(new.iloc[i]['remigrant'][2:6])].tail(2)['Location'].values[0]) + '. She was previously captured nesting ' + str(new.iloc[i]['remigrant.period']) + ' years ago on ' + str(df[df['all.tags'].str.contains(new.iloc[i]['remigrant'][2:6])].tail(2)['nest date'].values[0]) + '. The clutch she deposited contained ' + str(new.iloc[i]['eggs']) + ' eggs which were relocated to the ' + str(new.iloc[i]['hatchery site']) + ' hatchery as nest number ' + str(new.iloc[i]['hatchery nest number']) + '. She had a curved carapace length (CCL) of ' + str(float(new.iloc[i]['ccl'])) + ' and a curved carapace width (CCW) of ' + str(float(new.iloc[i]['ccw'])) + '.', style='List Bullet')
 
             elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['reclutch'] != ''):
-                    document.add_paragraph('A reclutch individual was seen nesting. This female, previously fitted with tag nos. ' + new.iloc[i]['reclutch'] + ', previously nested this season ' + str(new.iloc[i]['oii'])[0:-2] + ' days ago. This was her ' + str(new.iloc[i]['ocf'])[0:-2] + ' clutch of the season. She deposited a clutch size of ' + str(new.iloc[i]['eggs'])[0:-2] + ' eggs.', style='List Bullet')
+                    document.add_paragraph('A reclutch individual, carrying tag nos. ' + str(new.iloc[i]['reclutch']) + ', previously nested ' + str(new.iloc[i]['oii']) + ' days ago this season on ' + str(df[df['all.tags'].str.contains(new.iloc[i]['reclutch'][2:6])].tail(3)['nest date'].values[0][0:6]) + ' in ' + str(df[df['all.tags'].str.contains(new.iloc[i]['reclutch'][2:6])].tail(3)['Location'].values[0]) + '. This was her ' + nth[new.iloc[i]['ocf']] + ' clutch of the season. She laid ' + str(new.iloc[i]['eggs']) + ' eggs  which were relocated to the ' + str(new.iloc[i]['hatchery site']) + ' hatchery as nest number ' + str(new.iloc[i]['hatchery nest number']) + '. She had a curved carapace length (CCL) of ' + str(float(new.iloc[i]['ccl'])) + ' and a curved carapace width (CCW) of ' + str(float(new.iloc[i]['ccw'])) + '.', style='List Bullet')
 
             elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['new.tag'] != '') & (new.iloc[i]['eggs'] != ''):
-                    document.add_paragraph('A live turtle nesting was observed on ' + new.iloc[i]['Location'] + '. She was fitted with tag nos. ' + new.iloc[i]['new.tag'] + '. The clutch she deposited contained ' + str(new.iloc[i]['eggs'])[0:-2] + ' eggs.', style='List Bullet')
+                    document.add_paragraph('A live turtle nesting was observed on ' + new.iloc[i]['Location'] + '. She was fitted with tag nos. ' + new.iloc[i]['new.tag'] + '. The clutch she deposited contained ' + str(new.iloc[i]['eggs']) + ' eggs which were relocated to the ' + str(new.iloc[i]['hatchery site']) + ' hatchery as nest number ' + str(new.iloc[i]['hatchery nest number']) + '. She had a curved carapace length (CCL) of ' + str(float(new.iloc[i]['ccl'])) + ' and a curved carapace width (CCW) of ' + str(float(new.iloc[i]['ccw'])) + '.', style='List Bullet')
 
-            elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['new.tag'] == '') & (new.iloc[i]['eggs'] != ''):
-                    document.add_paragraph('A ' + new.iloc[i]['action'] + ' was found on ' + new.iloc[i]['Location'] + ' containing ' + str(new.iloc[i]['eggs'])[0:-2] + ' eggs.', style='List Bullet')
+            elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['new.tag'] == '') & (new.iloc[i]['eggs'] != '') & (new.iloc[i]['hatchery site'] != ''):
+                    document.add_paragraph('A ' + new.iloc[i]['action'] + ' was found in ' + new.iloc[i]['Location'] + ' containing ' + str(new.iloc[i]['eggs']) + ' eggs. Her clutch was relocated to the ' + str(new.iloc[i]['hatchery site']) + ' hatchery as nest number ' + str(new.iloc[i]['hatchery nest number']) + '.', style='List Bullet')
 
-            elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['eggs'] == '') & (new.iloc[i]['Location'] != 'Beach 3'):
+            elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['new.tag'] == '') & (new.iloc[i]['eggs'] != '') & (new.iloc[i]['hatchery site'] == ''):
+                    document.add_paragraph('A ' + new.iloc[i]['action'] + ' was found in ' + new.iloc[i]['Location'] + ' containing ' + str(new.iloc[i]['eggs']) + ' eggs.', style='List Bullet')
+
+            elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['eggs'] == '') & (new.iloc[i]['Location'] != 'Fuwairit'):
                     document.add_paragraph('A nest was found on ' + new.iloc[i]['Location'] + '.', style='List Bullet')
 
             elif (new.iloc[i]['action'] != 'Nest') & (new.iloc[i]['new.tag'] != ''):
-                    document.add_paragraph('A live turtle performing a false crawl was observed on ' + new.iloc[i]['Location'] + '. It was fitted with tag nos. ' + new.iloc[i]['new.tag'] + '.', style='List Bullet')
+                    document.add_paragraph('A live turtle performing a false crawl was observed on ' + new.iloc[i]['Location'] + '. It was fitted with tag nos. ' + new.iloc[i]['new.tag'] + '. The individual had a curved carapace length (CCL) of ' + str(float(new.iloc[i]['ccl'])) + ' and a curved carapace width (CCW) of ' + str(float(new.iloc[i]['ccw'])) + '.', style='List Bullet')
 
             elif (new.iloc[i]['action'] != 'Nest') & (new.iloc[i]['new.tag'] == ''):
                     document.add_paragraph('False crawl tracks were observed on ' + new.iloc[i]['Location'] + '.', style='List Bullet')
