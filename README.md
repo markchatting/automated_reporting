@@ -1,4 +1,4 @@
-# automated_reporting
+# Automated Reporting
 Automatically generate reports based on an updated excel spreadsheet
 This script automatically generates a word document based on an excel spreadsheet. This is a project that requires reporting on work carried out at regular intervals.
 Project staff update a shared excel spreadsheet and then this script automatically reads it and generates a report of the activity for the date period selected. I have
