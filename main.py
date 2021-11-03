@@ -76,19 +76,19 @@ def generate():
 
     for v in range(0, len(df)):
         if 'Fuw' in df['Location'][v]:
-            df['Location'][v] = 'Fuwairit'
+            df['Location'][v] = 'Location 1'
         else:
             df['Location'][v] = df['Location'][v]
 
     for p in range(0, len(df)):
         if 'Laf' in df['Location'][p]:
-            df['Location'][p] = 'Ras Laffan'
+            df['Location'][p] = 'Location 2'
         else:
             df['Location'][p] = df['Location'][p]
 
     for k in range(0, len(df)):
         if 'Gha' in df['Location'][k]:
-            df['Location'][k] = 'Al Ghariyah'
+            df['Location'][k] = 'Location 3'
         else:
             df['Location'][k] = df['Location'][k]
 
@@ -188,10 +188,10 @@ def generate():
 
     document = Document()
 
-    document.add_heading('Marine Turtle Conservation and Monitoring in Ras Laffan Industrial City and other sites in the State of Qatar', 0)
+    document.add_heading('Title of the Document', 0)
 
     document.add_heading('Bi-Weekly Report: ' + str(start_date)[1:-1] + ' to ' + str(end_date)[1:-1], 1)
-    document.add_heading('Prepared by the Environmental Science Centre of Qatar University for the 2021 season', 1)
+    document.add_heading('Prepared by the Joe Bloggs', 1)
 
     document.add_paragraph('')
 
@@ -210,12 +210,12 @@ def generate():
 
         for i in range(0, len(new)):
 
-            if (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['Location'] == 'Ras Rakkan'):
-                    document.add_paragraph(str(len(new)) + ' nests were found on Ras Rakkan on this survey.', style='List Bullet')
+            if (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['Location'] == 'Location 5'):
+                    document.add_paragraph(str(len(new)) + ' nests were found on Location 5 on this survey.', style='List Bullet')
                     break
 
-            elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['Location'] == 'Umm Tais'):
-                    document.add_paragraph(str(len(new)) + ' nests were found on Umm Tais on this survey.', style='List Bullet')
+            elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['Location'] == 'Location 6'):
+                    document.add_paragraph(str(len(new)) + ' nests were found on Location 6 on this survey.', style='List Bullet')
                     break
 
             if (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['remigrant'] != ''):
@@ -233,7 +233,7 @@ def generate():
             elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['new.tag'] == '') & (new.iloc[i]['eggs'] != '') & (new.iloc[i]['hatchery site'] == ''):
                     document.add_paragraph('A ' + new.iloc[i]['action'] + ' was found in ' + new.iloc[i]['Location'] + ' containing ' + str(new.iloc[i]['eggs']) + ' eggs.', style='List Bullet')
 
-            elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['eggs'] == '') & (new.iloc[i]['Location'] != 'Fuwairit'):
+            elif (new.iloc[i]['action'] == 'Nest') & (new.iloc[i]['eggs'] == '') & (new.iloc[i]['Location'] != 'Location 1'):
                     document.add_paragraph('A nest was found on ' + new.iloc[i]['Location'] + '.', style='List Bullet')
 
             elif (new.iloc[i]['action'] != 'Nest') & (new.iloc[i]['new.tag'] != ''):
