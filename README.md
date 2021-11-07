@@ -13,7 +13,7 @@ This report generator automatically creates:
 
 Here's a screen shot of the GUI:
 
-      ![GUI](https://user-images.githubusercontent.com/57613411/140638207-84347189-4b35-4e67-978a-20cb3a5b0456.JPG)
+   ![GUI](https://user-images.githubusercontent.com/57613411/140638207-84347189-4b35-4e67-978a-20cb3a5b0456.JPG)
 
 
 I have not uploaded the database or a sample of the reports as it contains confidential information belonging to the client. I have removed all information from this
