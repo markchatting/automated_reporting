@@ -11,9 +11,10 @@ This report generator automatically creates:
 3) Photos taken by team members
 4) Summary text of the outcomes of the preceeding report period
 
-I have not uploaded the database or a sample of the database as it contains confidential information belonging to the client. I have removed all information from this
-script that would identify the project, client or location where this work is carried out. 
-
 Here's a screen shot of the GUI:
 
-![GUI](https://user-images.githubusercontent.com/57613411/140638207-84347189-4b35-4e67-978a-20cb3a5b0456.JPG)
+      ![GUI](https://user-images.githubusercontent.com/57613411/140638207-84347189-4b35-4e67-978a-20cb3a5b0456.JPG)
+
+
+I have not uploaded the database or a sample of the reports as it contains confidential information belonging to the client. I have removed all information from this
+script that would identify the project, client or location where this work is carried out. 
