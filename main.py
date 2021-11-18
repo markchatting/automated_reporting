@@ -300,5 +300,4 @@ def generate():
 my_btn = Button(root, text='    Generate Report    ', command=generate)
 my_btn.pack()
 
-
 root.mainloop()
